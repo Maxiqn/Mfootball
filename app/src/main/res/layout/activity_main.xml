@@ -184,6 +184,16 @@
         android:layout_marginTop="8dp"
         android:layout_weight="1">
 
+        <TextView
+            android:id="@+id/noFixturesText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Keine Spiele verfügbar"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="@color/text_secondary"
+            android:visibility="gone" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/fixturesRecycler"
             android:layout_width="match_parent"

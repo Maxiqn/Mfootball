@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView fixturesRecycler;
     private RecyclerView competitionsRecycler;
     private TextView fixturesSummaryText;
+    private TextView noFixturesText;
     private TextView standingsText;
     private TextView competitionTitle;
     private TextView competitionDescription;
@@ -49,11 +50,13 @@ public class MainActivity extends AppCompatActivity {
     private Button loginButton;
     private GoogleSignInClient googleSignInClient;
     private final OkHttpClient client = new OkHttpClient();
-    private final String apiKey = "0858398f87f44a67b5a94ed0cbe593a9";
+    private final String apiKey = BuildConfig.FOOTBALL_DATA_API_KEY;
     private final List<CompetitionItem> competitions = new ArrayList<>();
     private FixtureAdapter fixtureAdapter;
     private CompetitionAdapter competitionAdapter;
     private int selectedCompetitionId = -1;
+    private static final String PREFS_NAME = "mfootball_prefs";
+    private static final String PREF_KEY_COMPETITION_ID = "selected_competition_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         fixturesRecycler = findViewById(R.id.fixturesRecycler);
         competitionsRecycler = findViewById(R.id.competitionsRecycler);
         fixturesSummaryText = findViewById(R.id.fixturesSummaryText);
+        noFixturesText = findViewById(R.id.noFixturesText);
         standingsText = findViewById(R.id.standingsText);
         competitionTitle = findViewById(R.id.competitionTitle);
         competitionDescription = findViewById(R.id.competitionDescription);
@@ -89,16 +93,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        final int savedCompetitionId = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getInt(PREF_KEY_COMPETITION_ID, -1);
+        selectedCompetitionId = savedCompetitionId;
+
         competitionDescription.setText("Wähle eine Liga aus der Liste, um Spiele, Tabellen und Echtzeitinfos zu sehen.");
         fixturesRecycler.setLayoutManager(new LinearLayoutManager(this));
-        fixtureAdapter = new FixtureAdapter(new ArrayList<>());
+        fixtureAdapter = new FixtureAdapter(new ArrayList<>(), new FixtureAdapter.OnFixtureSelectedListener() {
+            @Override
+            public void onFixtureSelected(Match match) {
+                openFixtureDetail(match);
+            }
+        });
         fixturesRecycler.setAdapter(fixtureAdapter);
+        noFixturesText.setVisibility(View.GONE);
 
         competitionsRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         competitionAdapter = new CompetitionAdapter(competitions, new CompetitionAdapter.OnCompetitionSelectedListener() {
             @Override
             public void onCompetitionSelected(CompetitionItem competition) {
                 selectedCompetitionId = competition.id;
+                getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                        .edit()
+                        .putInt(PREF_KEY_COMPETITION_ID, competition.id)
+                        .apply();
                 competitionAdapter.setSelectedCompetitionId(competition.id);
                 updateHeader(competition);
                 updateSummary("Lade Spiele für " + competition.name + "...");
@@ -163,6 +180,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadCompetitions() {
         swipeRefreshLayout.setRefreshing(true);
+        if (apiKey == null || apiKey.isEmpty()) {
+            swipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(this, "API key missing. Please configure FOOTBALL_DATA_API_KEY.", Toast.LENGTH_LONG).show();
+            return;
+        }
         Request request = new Request.Builder()
                 .url("https://api.football-data.org/v4/competitions?plan=TIER_ONE")
                 .addHeader("X-Auth-Token", apiKey)
@@ -175,6 +197,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         swipeRefreshLayout.setRefreshing(false);
+                        fixturesRecycler.setVisibility(View.GONE);
+                        noFixturesText.setVisibility(View.VISIBLE);
                         Toast.makeText(MainActivity.this, "Konnte Ligen nicht laden", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -203,10 +227,23 @@ public class MainActivity extends AppCompatActivity {
                         competitions.addAll(parsed);
                         competitionsRecycler.getAdapter().notifyDataSetChanged();
                         if (!parsed.isEmpty()) {
-                            CompetitionItem firstCompetition = parsed.get(0);
-                            selectedCompetitionId = firstCompetition.id;
-                            competitionAdapter.setSelectedCompetitionId(firstCompetition.id);
-                            updateHeader(firstCompetition);
+                            CompetitionItem selectedCompetition = null;
+                            for (CompetitionItem competition : parsed) {
+                                if (competition.id == selectedCompetitionId) {
+                                    selectedCompetition = competition;
+                                    break;
+                                }
+                            }
+                            if (selectedCompetition == null) {
+                                selectedCompetition = parsed.get(0);
+                                selectedCompetitionId = selectedCompetition.id;
+                                getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                                        .edit()
+                                        .putInt(PREF_KEY_COMPETITION_ID, selectedCompetitionId)
+                                        .apply();
+                            }
+                            competitionAdapter.setSelectedCompetitionId(selectedCompetition.id);
+                            updateHeader(selectedCompetition);
                             loadFixturesForCompetition(selectedCompetitionId);
                             loadStandingsForCompetition(selectedCompetitionId);
                         }
@@ -220,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout.setRefreshing(true);
         updateSummary("Spiele werden geladen...");
         Request request = new Request.Builder()
-                .url("https://api.football-data.org/v4/competitions/" + competitionId + "/matches?status=SCHEDULED")
+                .url("https://api.football-data.org/v4/competitions/" + competitionId + "/matches")
                 .addHeader("X-Auth-Token", apiKey)
                 .build();
 
@@ -231,6 +268,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         swipeRefreshLayout.setRefreshing(false);
+                        fixturesRecycler.setVisibility(View.GONE);
+                        noFixturesText.setVisibility(View.VISIBLE);
                         updateSummary("Spiele konnten nicht geladen werden.");
                         Toast.makeText(MainActivity.this, "Fehler beim Laden der Spiele", Toast.LENGTH_SHORT).show();
                     }
@@ -245,6 +284,8 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             swipeRefreshLayout.setRefreshing(false);
+                            fixturesRecycler.setVisibility(View.GONE);
+                            noFixturesText.setVisibility(View.VISIBLE);
                             updateSummary("Spiele konnten nicht geladen werden.");
                             Toast.makeText(MainActivity.this, "Ungültige Antwort vom Server", Toast.LENGTH_SHORT).show();
                         }
@@ -259,9 +300,13 @@ public class MainActivity extends AppCompatActivity {
                         swipeRefreshLayout.setRefreshing(false);
                         fixtureAdapter.updateFixtures(fixtures);
                         if (fixtures.isEmpty()) {
-                            updateSummary("Für diese Liga sind keine anstehenden Spiele verfügbar.");
+                            fixturesRecycler.setVisibility(View.GONE);
+                            noFixturesText.setVisibility(View.VISIBLE);
+                            updateSummary("Für diese Liga sind keine Spiele verfügbar.");
                         } else {
-                            updateSummary(fixtures.size() + " anstehende Spiele geladen.");
+                            fixturesRecycler.setVisibility(View.VISIBLE);
+                            noFixturesText.setVisibility(View.GONE);
+                            updateSummary(fixtures.size() + " Spiele geladen. Tippe auf ein Match für Details.");
                         }
                     }
                 });
@@ -419,6 +464,16 @@ public class MainActivity extends AppCompatActivity {
         fixturesSummaryText.setText(message);
     }
 
+    private void openFixtureDetail(Match match) {
+        Intent intent = new Intent(this, MatchDetailActivity.class);
+        intent.putExtra("homeTeam", match.homeTeam);
+        intent.putExtra("awayTeam", match.awayTeam);
+        intent.putExtra("competitionName", match.competitionName);
+        intent.putExtra("status", match.status);
+        intent.putExtra("date", match.utcDate);
+        startActivity(intent);
+    }
+
     static String formatDate(String rawDate) {
         if (rawDate == null || rawDate.isEmpty()) {
             return "TBD";
@@ -451,15 +506,21 @@ public class MainActivity extends AppCompatActivity {
 
     private static class FixtureAdapter extends RecyclerView.Adapter<FixtureAdapter.FixtureViewHolder> {
         private final List<Match> fixtures;
+        private final OnFixtureSelectedListener listener;
 
-        FixtureAdapter(List<Match> fixtures) {
+        FixtureAdapter(List<Match> fixtures, OnFixtureSelectedListener listener) {
             this.fixtures = fixtures;
+            this.listener = listener;
         }
 
         void updateFixtures(List<Match> newFixtures) {
             fixtures.clear();
             fixtures.addAll(newFixtures);
             notifyDataSetChanged();
+        }
+
+        interface OnFixtureSelectedListener {
+            void onFixtureSelected(Match match);
         }
 
         @Override
@@ -470,7 +531,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(FixtureViewHolder holder, int position) {
-            holder.bind(fixtures.get(position));
+            holder.bind(fixtures.get(position), listener);
         }
 
         @Override
@@ -492,11 +553,30 @@ public class MainActivity extends AppCompatActivity {
                 statusView = itemView.findViewById(R.id.fixtureStatus);
             }
 
-            void bind(Match match) {
+            void bind(final Match match, final OnFixtureSelectedListener listener) {
                 titleView.setText(match.homeTeam + " vs " + match.awayTeam);
                 dateView.setText(formatDate(match.utcDate));
                 leagueView.setText(match.competitionName);
                 statusView.setText(match.status);
+                int statusColor;
+                String normalizedStatus = match.status != null ? match.status.toUpperCase() : "";
+                if (normalizedStatus.contains("LIVE") || normalizedStatus.contains("IN PLAY")) {
+                    statusColor = ContextCompat.getColor(itemView.getContext(), R.color.brand_green);
+                } else if (normalizedStatus.contains("PAUSED") || normalizedStatus.contains("HALF")) {
+                    statusColor = ContextCompat.getColor(itemView.getContext(), R.color.accent_gold);
+                } else {
+                    statusColor = ContextCompat.getColor(itemView.getContext(), R.color.surface_variant);
+                }
+                statusView.setBackgroundColor(statusColor);
+                statusView.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.white));
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (listener != null) {
+                            listener.onFixtureSelected(match);
+                        }
+                    }
+                });
             }
         }
     }

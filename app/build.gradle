@@ -2,16 +2,23 @@ plugins {
     id 'com.android.application'
 }
 
+def footballApiKey = project.hasProperty('footballDataApiKey') ? project.property('footballDataApiKey') : (System.getenv('FOOTBALL_DATA_API_KEY') ?: '')
+
 android {
     namespace 'com.maxiqn.mfootball'
     compileSdk 35
+
+    buildFeatures {
+        buildConfig true
+    }
 
     defaultConfig {
         applicationId 'com.maxiqn.mfootball'
         minSdk 21
         targetSdk 35
-        versionCode 110
-        versionName '1.10'
+        versionCode 111
+        versionName '1.11'
+        buildConfigField "String", "FOOTBALL_DATA_API_KEY", "\"${footballApiKey}\""
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
