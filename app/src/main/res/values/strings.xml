@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mfootball</string>
+    <string name="app_tagline">Live Football Ticker</string>
     <string name="header_subtitle">Live-Spielplan, Tabellen &amp; Top-Ligen</string>
     <string name="select_competition">Wähle eine Liga</string>
     <string name="competition_description">Wähle eine Liga, um Spiele, Tabellen und Echtzeitinfos zu sehen.</string>
     <string name="not_signed_in">Nicht angemeldet</string>
-    <string name="sign_in">Anmelden</string>
+    <string name="sign_in">Mit Google anmelden</string>
+    <string name="sign_out">Abmelden</string>
     <string name="top_competitions">Top-Ligen</string>
     <string name="top_five_standings">Top-5-Tabelle</string>
     <string name="loading_standings">Tabellendaten werden geladen …</string>
@@ -14,4 +16,25 @@
     <string name="todays_focus">Heute im Fokus</string>
     <string name="refresh_matches">Spiele aktualisieren</string>
     <string name="no_matches">Keine Spiele verfügbar</string>
+    <string name="match_details">Spieldetails</string>
+    <string name="matchup_format">%1$s vs %2$s</string>
+    <string name="live_now">LIVE</string>
+    <string name="scheduled">Geplant</string>
+    <string name="finished">Beendet</string>
+    <string name="paused">Halbzeit</string>
+    <string name="error_api_key">API-Schlüssel fehlt. Bitte konfigurieren Sie FOOTBALL_DATA_API_KEY.</string>
+    <string name="error_loading">Fehler beim Laden. Bitte versuchen Sie es später erneut.</string>
+    <string name="add_favorite">Zu Favoriten hinzufügen</string>
+    <string name="remove_favorite">Aus Favoriten entfernen</string>
+    <string name="favorites">Favoriten</string>
+    <string name="all_matches">Alle Spiele</string>
+    <string name="live_matches">Live-Spiele</string>
+    <string name="notifications">Benachrichtigungen</string>
+    <string name="notification_goal">⚽ Tor! %1$s</string>
+    <string name="notification_red_card">🔴 Rote Karte in %1$s</string>
+    <string name="notification_match_start">🎯 Spielstart: %1$s</string>
+    <string name="settings">Einstellungen</string>
+    <string name="dark_mode">Dunkler Modus</string>
+    <string name="push_notifications">Push-Benachrichtigungen</string>
+    <string name="cache_size">Cache-Größe</string>
 </resources>
