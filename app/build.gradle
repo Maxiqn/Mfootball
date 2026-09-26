@@ -16,10 +16,9 @@ android {
         applicationId 'com.maxiqn.mfootball'
         minSdk 21
         targetSdk 35
-        versionCode 111
-        versionName '1.11'
+        versionCode 140
+        versionName '1.4'
         buildConfigField "String", "FOOTBALL_DATA_API_KEY", "\"${footballApiKey}\""
-
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
@@ -33,7 +32,7 @@ android {
     }
 
     packagingOptions {
-        exclude 'META-INF/proguard/androidx-*.pro'
+        resources.excludes += ['META-INF/proguard/androidx-*.pro']
     }
 
     buildTypes {

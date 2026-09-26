@@ -26,7 +26,7 @@
                 android:id="@+id/headerTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Mfootball"
+                android:text="@string/app_name"
                 android:textAppearance="?attr/textAppearanceHeadline5"
                 android:textColor="@color/text_primary"
                 android:textStyle="bold" />
@@ -36,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Live-Spielplan, Tabellen &amp; Top-Ligen"
+                android:text="@string/header_subtitle"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="#E2E8F0" />
 
@@ -45,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Wähle eine Liga"
+                android:text="@string/select_competition"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/text_primary"
                 android:textStyle="bold" />
@@ -55,7 +55,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Hier erscheinen die wichtigsten Infos zur ausgewählten Liga."
+                android:text="@string/competition_description"
                 android:textAppearance="?attr/textAppearanceBodySmall"
                 android:textColor="@color/text_secondary" />
 
@@ -71,7 +71,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Nicht angemeldet"
+                    android:text="@string/not_signed_in"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textColor="@color/text_primary" />
 
@@ -79,7 +79,8 @@
                     android:id="@+id/loginButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Anmelden" />
+                    android:minHeight="48dp"
+                    android:text="@string/sign_in" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -88,7 +89,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Top Ligen"
+        android:text="@string/top_competitions"
         android:textAppearance="?attr/textAppearanceSubtitle1"
         android:textColor="@color/text_primary"
         android:textStyle="bold" />
@@ -98,7 +99,9 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_marginTop="8dp"
-        android:overScrollMode="never" />
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingEnd="8dp" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -118,7 +121,7 @@
                 android:id="@+id/standingsTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Top 5 Tabelle"
+                android:text="@string/top_five_standings"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/text_primary"
                 android:textStyle="bold" />
@@ -128,9 +131,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="Lade Tabellen-Daten..."
+                android:text="@string/loading_standings"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="@color/text_secondary" />
+                android:textColor="@color/text_secondary"
+                android:lineSpacingExtra="2dp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -151,7 +155,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Match Insights"
+                android:text="@string/match_insights"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/text_primary"
                 android:textStyle="bold" />
@@ -161,7 +165,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Wähle eine Liga, um die neuesten Spiele und Tabellen anzuzeigen."
+                android:text="@string/choose_competition_hint"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="@color/text_secondary"
                 android:lineSpacingExtra="2dp" />
@@ -172,7 +176,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Heute im Fokus"
+        android:text="@string/todays_focus"
         android:textAppearance="?attr/textAppearanceSubtitle1"
         android:textColor="@color/text_primary"
         android:textStyle="bold" />
@@ -182,25 +186,32 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:contentDescription="@string/refresh_matches">
 
-        <TextView
-            android:id="@+id/noFixturesText"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Keine Spiele verfügbar"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textColor="@color/text_secondary"
-            android:visibility="gone" />
+            android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/fixturesRecycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingBottom="8dp"
-            tools:listitem="@layout/item_fixture" />
+            <TextView
+                android:id="@+id/noFixturesText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:padding="24dp"
+                android:text="@string/no_matches"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="@color/text_secondary"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/fixturesRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="8dp"
+                tools:listitem="@layout/item_fixture" />
+        </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

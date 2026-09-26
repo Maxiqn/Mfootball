@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mfootball</string>
+    <string name="header_subtitle">Live-Spielplan, Tabellen &amp; Top-Ligen</string>
+    <string name="select_competition">Wähle eine Liga</string>
+    <string name="competition_description">Wähle eine Liga, um Spiele, Tabellen und Echtzeitinfos zu sehen.</string>
+    <string name="not_signed_in">Nicht angemeldet</string>
+    <string name="sign_in">Anmelden</string>
+    <string name="top_competitions">Top-Ligen</string>
+    <string name="top_five_standings">Top-5-Tabelle</string>
+    <string name="loading_standings">Tabellendaten werden geladen …</string>
+    <string name="match_insights">Match Insights</string>
+    <string name="choose_competition_hint">Wähle eine Liga, um die neuesten Spiele und Tabellen anzuzeigen.</string>
+    <string name="todays_focus">Heute im Fokus</string>
+    <string name="refresh_matches">Spiele aktualisieren</string>
+    <string name="no_matches">Keine Spiele verfügbar</string>
 </resources>
